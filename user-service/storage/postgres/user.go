@@ -218,6 +218,10 @@ func (r *userRepo) UserList(limit, page int64) ([]*pb.User, int64, error) {
 			pq.Array(&user.PhoneNumbers),
 		)
 
+		if err != nil {
+			return nil, 0, err
+		}
+
 		var address pb.Address
 
 		addressQuery := `SELECT city, country, district, postal_code FROM adress WHERE user_id = $1`
@@ -247,5 +251,8 @@ func (r *userRepo) UserList(limit, page int64) ([]*pb.User, int64, error) {
 	var count int64
 	err = r.db.QueryRow("SELECT COUNT(*) FROM users").Scan(&count)
 
+	if err != nil {
+		return nil, 0, err
+	}
 	return users, count, nil
 }
