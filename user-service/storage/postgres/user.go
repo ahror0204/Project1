@@ -1,12 +1,14 @@
 package postgres
 
 import (
+	"errors"
 	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	pb "github.com/project1/user-service/genproto"
+	
 )
 
 type userRepo struct {
@@ -16,6 +18,49 @@ type userRepo struct {
 //NewUserRepo ...
 func NewUserRepo(db *sqlx.DB) *userRepo {
 	return &userRepo{db: db}
+}
+
+func (r *userRepo) LogIn(login *pb.LogInRequest) (*pb.LogInResponse, error) {
+	var ruser pb.LogInResponse
+	loginQuery := `SELECT id, first_name, last_name, email, bio, status, phone_number, user_name, password FROM users WHERE email = $1`
+	err := r.db.QueryRow(loginQuery, login.Email).Scan(
+		&ruser.Id,
+		&ruser.FirstName,
+		&ruser.LastName,
+		&ruser.Email,
+		&ruser.Bio,
+		&ruser.Status,
+		pq.Array(&ruser.PhoneNumbers),
+		&ruser.UserName,
+		&ruser.Password,
+	)
+	if err != nil {
+		return &pb.LogInResponse{}, err
+	}
+	getByIdAdressQuery := `SELECT city, country, district, postal_code FROM adress WHERE user_id = $1`
+	rows, err := r.db.Query(getByIdAdressQuery, ruser.Id)
+	if err != nil {
+		return nil, err
+	}
+	var tempUser pb.User
+	for rows.Next() {
+		var adressById pb.Address
+		err = rows.Scan(
+			&adressById.City,
+			&adressById.Country,
+			&adressById.District,
+			&adressById.PostalCode,
+		)
+		if err != nil {
+			return nil, err
+		}
+		tempUser.Address = append(tempUser.Address, &adressById)
+	}
+	ruser.Address = tempUser.Address
+
+	
+
+	return &ruser, nil
 }
 
 func (r *userRepo) CreateUser(user *pb.User) (*pb.User, error) {
@@ -28,10 +73,9 @@ func (r *userRepo) CreateUser(user *pb.User) (*pb.User, error) {
 	if err != nil {
 		return &pb.User{}, err
 	}
-
-	insertUserQuery := `INSERT INTO users (id, first_name, last_name, email, bio, status, created_at, phone_number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-	RETURNING id, first_name, last_name, email, bio, phone_number, status, created_at`
-	err = r.db.QueryRow(insertUserQuery, id, user.FirstName, user.LastName, user.Email, user.Bio, user.Status, time_at, pq.Array(user.PhoneNumbers)).Scan(
+	insertUserQuery := `INSERT INTO users (id, first_name, last_name, email, bio, status, created_at, phone_number, user_name, password, refresh_token, access_token) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+	RETURNING id, first_name, last_name, email, bio, phone_number, status, user_name, refresh_token, access_token`
+	err = r.db.QueryRow(insertUserQuery, id, user.FirstName, user.LastName, user.Email, user.Bio, user.Status, time_at, pq.Array(user.PhoneNumbers), user.UserName, user.Password, user.RefreshToken, user.AccessToken).Scan(
 		&ruser.Id,
 		&ruser.FirstName,
 		&ruser.LastName,
@@ -39,7 +83,10 @@ func (r *userRepo) CreateUser(user *pb.User) (*pb.User, error) {
 		&ruser.Bio,
 		pq.Array(&ruser.PhoneNumbers),
 		&ruser.Status,
-		&ruser.CreatedAt,
+		// &ruser.CreatedAt,
+		&ruser.UserName,
+		&ruser.RefreshToken,
+		&ruser.AccessToken,
 	)
 	if err != nil {
 		return &pb.User{}, err
@@ -48,7 +95,7 @@ func (r *userRepo) CreateUser(user *pb.User) (*pb.User, error) {
 		var adrsId string
 		insertAdressQuery := `INSERT INTO adress (user_id, city, country, district, postal_code)
 			VALUES ($1, $2, $3, $4, $5) RETURNING user_id`
-		err = r.db.QueryRow(insertAdressQuery, user.Id, value.City, value.Country, value.District, value.PostalCode).Scan(&adrsId)
+		err = r.db.QueryRow(insertAdressQuery, ruser.Id, value.City, value.Country, value.District, value.PostalCode).Scan(&adrsId)
 		if err != nil {
 			return nil, err
 		}
@@ -255,4 +302,28 @@ func (r *userRepo) UserList(limit, page int64) ([]*pb.User, int64, error) {
 		return nil, 0, err
 	}
 	return users, count, nil
+}
+
+func (r *userRepo) CheckFeild(field, value string) (bool, error) {
+	var cle int
+	if field == "username" {
+		err := r.db.QueryRow("SELECT COUNT(1) FROM users WHERE user_name = $1 AND deleted_at = NULL", value).Scan(&cle)
+		if err != nil {
+			return false, err
+		}
+	} else if field == "email" {
+		err := r.db.QueryRow("SELECT COUNT(1) FROM users WHERE user_name = $1 AND deleted_at = NULL", value).Scan(&cle)
+		if err != nil {
+			return false, err
+		}
+	} else {
+		err := errors.New("ERROR IN CheckField")
+		return false, err
+	}
+
+	if cle == 0 {
+		return false, nil
+	}
+
+	return true, nil
 }

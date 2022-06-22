@@ -15,6 +15,11 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
+type EmailVer struct {
+	Email     string `protobuf:"bytes,4,opt,name=email,proto3" json:"email"`
+	EmailCode string `protobuf:"bytes,15,opt,name=email_code,json=emailCode,proto3" json:"email_code"`
+}
+
 type Media struct {
 	Id   string `protobuf:"bytes,1,opt,name=id,proto3" json:"id"`
 	Type string `protobuf:"bytes,2,opt,name=type,proto3" json:"type"`
@@ -49,6 +54,14 @@ type CreateUserReqBody struct {
 	UpdatedAt    string    `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at"`
 	DeletedAt    string    `protobuf:"bytes,11,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at"`
 	Posts        []Post    `protobuf:"bytes,12,rep,name=posts,proto3" json:"posts"`
+	UserName     string    `protobuf:"bytes,13,opt,name=user_name,json=userName,proto3" json:"user_name"`
+	Password     string    `protobuf:"bytes,14,opt,name=password,proto3" json:"password"`
+	RefreshToken string    `protobuf:"bytes,16,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token"`
+	AccessToken  string    `protobuf:"bytes,17,opt,name=access_token,json=accessToken,proto3" json:"access_token"`
+}
+
+func (h *handlerV1) LogIn(c *gin.Context) {
+	
 }
 
 // @Summary Create user
@@ -221,8 +234,6 @@ func (h *handlerV1) UpdateUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 }
-
-// UserList get limited users
 
 // @ListUsers returns list of users
 // @Summary Get users list

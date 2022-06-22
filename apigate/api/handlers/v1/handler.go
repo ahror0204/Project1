@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/project1/apigate/api/auth"
 	repo "github.com/project1/apigate/storage/repo"
 
 	"github.com/project1/apigate/config"
@@ -13,6 +14,7 @@ type handlerV1 struct {
 	serviceManager services.IServiceManager
 	cfg            config.Config
 	redisStorage   repo.RedisRepositoryStorage
+	jwtHandler     auth.JWtHandler
 }
 
 // HandlerV1Config ...
@@ -21,6 +23,7 @@ type HandlerV1Config struct {
 	ServiceManager services.IServiceManager
 	Cfg            config.Config
 	Redis          repo.RedisRepositoryStorage
+	jwtHandler     auth.JWtHandler
 }
 
 // New ...
@@ -30,5 +33,6 @@ func New(c *HandlerV1Config) *handlerV1 {
 		serviceManager: c.ServiceManager,
 		cfg:            c.Cfg,
 		redisStorage:   c.Redis,
+		jwtHandler:     c.jwtHandler,
 	}
 }

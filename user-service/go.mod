@@ -13,6 +13,8 @@ require (
 	google.golang.org/grpc v1.46.2
 )
 
+require golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+
 require (
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect

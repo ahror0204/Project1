@@ -19,6 +19,8 @@ type Config struct {
 
 	LogeLevel string
 	HTTPPort  string
+
+	SigningKey string
 }
 
 func Load() Config {
@@ -35,7 +37,10 @@ func Load() Config {
 	c.RedisHost = cast.ToString(getOrReturnDefault("REDIS_HOST", "localhost"))
 	c.RedisPort = cast.ToInt(getOrReturnDefault("REDIS_PORT", 6379))
 
+	c.SigningKey = cast.ToString(getOrReturnDefault("SIGNING_KEY", "bzqymwhbwgholtdyzjvqaycuxwnmeqczzosvmafrjfskmepquudmdktutkyzowntnvwurvkxywkpxsexhkkwcqgsbbbxlqyuklcrbypczsfhwejwqebsxqmprueopdexwdmukhfkujxhjeecfiwwspjgbgcgowew"))
+	
 	c.CtxTimeout = cast.ToInt(getOrReturnDefault("CTX_TIMEOUT", 7))
+
 	return c
 }
 

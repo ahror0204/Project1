@@ -112,6 +112,74 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/users/register": {
+            "post": {
+                "description": "This api uses for registration new user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Register User",
+                "parameters": [
+                    {
+                        "description": "user body",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateUserReqBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/users/verification": {
+            "post": {
+                "description": "This api uses for sendin email code to user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Send Email Code",
+                "parameters": [
+                    {
+                        "description": "user body",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.EmailVer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/users/{id}": {
             "get": {
                 "description": "This api uses for getting user by id",
@@ -207,6 +275,9 @@ const docTemplate = `{
         "v1.CreateUserReqBody": {
             "type": "object",
             "properties": {
+                "access_token": {
+                    "type": "string"
+                },
                 "address": {
                     "type": "array",
                     "items": {
@@ -234,6 +305,9 @@ const docTemplate = `{
                 "last_name": {
                     "type": "string"
                 },
+                "password": {
+                    "type": "string"
+                },
                 "phone_numbers": {
                     "type": "array",
                     "items": {
@@ -246,10 +320,27 @@ const docTemplate = `{
                         "$ref": "#/definitions/v1.Post"
                     }
                 },
+                "refresh_token": {
+                    "type": "string"
+                },
                 "status": {
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.EmailVer": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "email_code": {
                     "type": "string"
                 }
             }

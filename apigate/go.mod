@@ -3,6 +3,7 @@ module github.com/project1/apigate
 go 1.18
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.8.1
 	github.com/goccy/go-json v0.9.7
 	github.com/golang/protobuf v1.5.2
@@ -12,8 +13,10 @@ require (
 	github.com/swaggo/gin-swagger v1.4.3
 	github.com/swaggo/swag v1.8.2
 	go.uber.org/zap v1.21.0
+	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 	google.golang.org/grpc v1.47.0
 	google.golang.org/protobuf v1.28.0
+	gopkg.in/mail.v2 v2.3.1
 )
 
 require (
@@ -37,11 +40,11 @@ require (
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
 	golang.org/x/net v0.0.0-20220607020251-c690dde0001d // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

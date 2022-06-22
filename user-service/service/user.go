@@ -15,6 +15,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"golang.org/x/crypto/bcrypt"
 )
 
 //UserService ...
@@ -33,6 +34,30 @@ func NewUserService(db *sqlx.DB, log l.Logger, client cl.GrpcClientI) *UserServi
 	}
 }
 
+func(s *UserService) LogIn(ctx context.Context, req *pb.LogInRequest) (*pb.LogInResponse, error) {
+	user, err := s.storage.User().LogIn(req)
+	if err != nil {
+		s.logger.Error("pasword", l.Error(err))
+		return nil, status.Error(codes.Internal, "failed while getting by Id user")
+	}
+
+	posts, err := s.client.PostService().GetAllUserPosts(ctx, &pb.GetUserPostsrequest{UserId: user.Id})
+	
+	if err != nil {
+		s.logger.Error("failed while getting user posts", l.Error(err))
+		return nil, status.Error(codes.Internal, "failed while getting user posts")
+	}
+	user.Posts = posts.Posts
+	
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+	if err != nil {
+		s.logger.Error("password comparison error", l.Error(err))
+		return nil, status.Error(codes.Internal, "password comparison error")
+	}
+
+	return user, nil
+}
+
 func (s *UserService) CreateUser(ctx context.Context, req *pb.User) (*pb.User, error) {
 
 	user, err := s.storage.User().CreateUser(req)
@@ -42,7 +67,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *pb.User) (*pb.User, e
 	}
 	if req.Posts != nil {
 		for _, post := range req.Posts {
-			post.UserId = req.Id
+			post.UserId = user.Id
 			createdPosts, err := s.client.PostService().CreatePost(context.Background(), post)
 			if err != nil {
 				s.logger.Error("failed while inserting user post", l.Error(err))
@@ -80,7 +105,7 @@ func (s *UserService) GetUserById(ctx context.Context, req *pb.GetUserByIdReques
 	}
 
 	user.Posts = posts.Posts
-	return user, err
+	return user, nil
 }
 
 func (s *UserService) GetAllUser(ctx context.Context, req *pb.Empty) (*pb.GetAllResponse, error) {
@@ -157,4 +182,16 @@ func (s *UserService) UserList(ctx context.Context, req *pb.UserListRequest) (*p
 		User:  users,
 		Count: count,
 	}, nil
+}
+
+func (s *UserService) CheckField(ctx context.Context, req *pb.UserCheckRequest) (*pb.UserCheckResponse, error) {
+	
+	bl, err := s.storage.User().CheckFeild(req.Field, req.Value)
+	
+	if err != nil {
+		s.logger.Error("CheckFeild FUNC ERROR", l.Error(err))
+		return nil, status.Error(codes.Internal, "CheckFeild FUNC ERROR")
+	}
+
+	return &pb.UserCheckResponse{Response: bl}, nil
 }

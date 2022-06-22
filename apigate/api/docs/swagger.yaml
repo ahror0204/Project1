@@ -12,6 +12,8 @@ definitions:
     type: object
   v1.CreateUserReqBody:
     properties:
+      access_token:
+        type: string
       address:
         items:
           $ref: '#/definitions/v1.Address'
@@ -30,6 +32,8 @@ definitions:
         type: string
       last_name:
         type: string
+      password:
+        type: string
       phone_numbers:
         items:
           type: string
@@ -38,9 +42,20 @@ definitions:
         items:
           $ref: '#/definitions/v1.Post'
         type: array
+      refresh_token:
+        type: string
       status:
         type: string
       updated_at:
+        type: string
+      user_name:
+        type: string
+    type: object
+  v1.EmailVer:
+    properties:
+      email:
+        type: string
+      email_code:
         type: string
     type: object
   v1.Media:
@@ -152,6 +167,50 @@ paths:
           schema:
             type: string
       summary: Get users list
+      tags:
+      - users
+  /v1/users/register:
+    post:
+      consumes:
+      - application/json
+      description: This api uses for registration new user
+      parameters:
+      - description: user body
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateUserReqBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Register User
+      tags:
+      - users
+  /v1/users/verification:
+    post:
+      consumes:
+      - application/json
+      description: This api uses for sendin email code to user
+      parameters:
+      - description: user body
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/v1.EmailVer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Send Email Code
       tags:
       - users
   /v1/usersupdate/{id}:

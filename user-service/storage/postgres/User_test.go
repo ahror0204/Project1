@@ -7,6 +7,7 @@ import (
 	pb "github.com/project1/user-service/genproto"
 )
 
+
 func TestUserRepo_Create(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -21,20 +22,18 @@ func TestUserRepo_Create(t *testing.T) {
 				LastName:  "ccccc",
 				Email:        "saaaaaa",
 				Bio:          "assdasss",
-				Address:      nil,
-				Status:       "pppppppppp",
-				CreatedAt: "",
 				PhoneNumbers: []string{"7777777777", "8888888888"},
+				Status:       "pppppppppp",
+				
 			},
 			want: &pb.User{
 				FirstName: "aaaaa",
 				LastName:  "ccccc",
 				Email:        "saaaaaa",
 				Bio:          "assdasss",
-				Address:      nil,
-				Status:       "pppppppppp",
-				CreatedAt: "",
 				PhoneNumbers: []string{"7777777777", "8888888888"},
+				Status:       "pppppppppp",
+				
 			},
 			wantErr: false,
 		},
@@ -48,9 +47,9 @@ func TestUserRepo_Create(t *testing.T) {
 			}
 
 			got.Id = ""
-			got.Posts = nil
+			
 			got.Address = nil
-			if !reflect.DeepEqual(tc.want, got) {
+			if !reflect.DeepEqual(&tc.want, got) {
 				t.Fatalf("%s: expected: %v, got: %v", tc.name, tc.want, got)
 			}
 		})

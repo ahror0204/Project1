@@ -11,7 +11,20 @@ service UserService {
     rpc GetAllUser(Empty) returns (GetAllResponse);
     rpc GetUserFromPost(GetUserFromPostRequest) returns (GetUserFromPostResponse);
     rpc UserList(UserListRequest) returns (UserListResponse);
+    rpc CheckField(UserCheckRequest) returns (UserCheckResponse);
 }
+//-------------------------CheckField----------------------------
+
+message UserCheckRequest {
+    string field = 1;
+    string value = 2;
+}
+
+message UserCheckResponse {
+    bool response = 1;
+}
+
+
 //----------------------UserList----------------------------------
 message UserListRequest {
     int64 limit = 1;
@@ -54,6 +67,11 @@ message User {
     string updated_at = 10; 
     string deleted_at = 11; 
     repeated Post posts = 12;
+    string user_name =13;
+    string password = 14;
+    string refresh_token = 15;
+    string access_token = 16;
+    string email_code = 17;
 }
 
 message Address {
