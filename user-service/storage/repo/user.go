@@ -13,5 +13,5 @@ type UserStorageI interface {
 	GetUserFromPost(userID string) (*pb.GetUserFromPostResponse, error)
 	UserList(limit, page int64) ([]*pb.User, int64, error)
 	CheckFeild(field, value string) (bool, error)
-	LogIn(*pb.LogInRequest) (*pb.LogInResponse, error)
+	LogIn(*pb.LogInRequest) (*pb.User, error)
 }

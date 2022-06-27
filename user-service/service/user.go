@@ -34,7 +34,7 @@ func NewUserService(db *sqlx.DB, log l.Logger, client cl.GrpcClientI) *UserServi
 	}
 }
 
-func(s *UserService) LogIn(ctx context.Context, req *pb.LogInRequest) (*pb.LogInResponse, error) {
+func(s *UserService) LogIn(ctx context.Context, req *pb.LogInRequest) (*pb.User, error) {
 	user, err := s.storage.User().LogIn(req)
 	if err != nil {
 		s.logger.Error("pasword", l.Error(err))

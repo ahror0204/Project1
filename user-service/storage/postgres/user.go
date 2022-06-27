@@ -20,8 +20,8 @@ func NewUserRepo(db *sqlx.DB) *userRepo {
 	return &userRepo{db: db}
 }
 
-func (r *userRepo) LogIn(login *pb.LogInRequest) (*pb.LogInResponse, error) {
-	var ruser pb.LogInResponse
+func (r *userRepo) LogIn(login *pb.LogInRequest) (*pb.User, error) {
+	var ruser pb.User
 	loginQuery := `SELECT id, first_name, last_name, email, bio, status, phone_number, user_name, password FROM users WHERE email = $1`
 	err := r.db.QueryRow(loginQuery, login.Email).Scan(
 		&ruser.Id,
@@ -35,7 +35,7 @@ func (r *userRepo) LogIn(login *pb.LogInRequest) (*pb.LogInResponse, error) {
 		&ruser.Password,
 	)
 	if err != nil {
-		return &pb.LogInResponse{}, err
+		return &pb.User{}, err
 	}
 	getByIdAdressQuery := `SELECT city, country, district, postal_code FROM adress WHERE user_id = $1`
 	rows, err := r.db.Query(getByIdAdressQuery, ruser.Id)
@@ -73,9 +73,9 @@ func (r *userRepo) CreateUser(user *pb.User) (*pb.User, error) {
 	if err != nil {
 		return &pb.User{}, err
 	}
-	insertUserQuery := `INSERT INTO users (id, first_name, last_name, email, bio, status, created_at, phone_number, user_name, password, refresh_token, access_token) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-	RETURNING id, first_name, last_name, email, bio, phone_number, status, user_name, refresh_token, access_token`
-	err = r.db.QueryRow(insertUserQuery, id, user.FirstName, user.LastName, user.Email, user.Bio, user.Status, time_at, pq.Array(user.PhoneNumbers), user.UserName, user.Password, user.RefreshToken, user.AccessToken).Scan(
+	insertUserQuery := `INSERT INTO users (id, first_name, last_name, email, bio, status, created_at, phone_number, user_name, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+	RETURNING id, first_name, last_name, email, bio, phone_number, status, user_name`
+	err = r.db.QueryRow(insertUserQuery, id, user.FirstName, user.LastName, user.Email, user.Bio, user.Status, time_at, pq.Array(user.PhoneNumbers), user.UserName, user.Password).Scan(
 		&ruser.Id,
 		&ruser.FirstName,
 		&ruser.LastName,
@@ -85,8 +85,6 @@ func (r *userRepo) CreateUser(user *pb.User) (*pb.User, error) {
 		&ruser.Status,
 		// &ruser.CreatedAt,
 		&ruser.UserName,
-		&ruser.RefreshToken,
-		&ruser.AccessToken,
 	)
 	if err != nil {
 		return &pb.User{}, err

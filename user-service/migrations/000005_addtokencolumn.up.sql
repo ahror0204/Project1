@@ -1,2 +1,0 @@
-ALTER TABLE users ADD COLUMN refresh_token  TEXT UNIQUE;
-ALTER TABLE users ADD COLUMN access_token  TEXT UNIQUE;
