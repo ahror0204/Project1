@@ -72,6 +72,14 @@ func (h handlerV1) RegisterUser(c *gin.Context) {
 		return
 	}
 
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		h.log.Error("failed set to redis", l.Error(err))
+		return
+	}
+
 	if !status.Response {
 		status2, err := h.serviceManager.UserService().CheckField(ctx, &pb.UserCheckRequest{
 			Field: "email",
@@ -221,8 +229,7 @@ func (h handlerV1) VerifyUser(c *gin.Context) {
 		return
 	}
 
-	redisBody.RefreshToken = refresh
-	redisBody.AccessToken = access
+	
 //--------------------------------------------------------------------------------------
 	if mailData.EmailCode == redisBody.EmailCode {
 
@@ -235,7 +242,21 @@ func (h handlerV1) VerifyUser(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusCreated, createVal)
+		var frontResp = CreateUserReqBody {
+			Id: createVal.Id,
+			FirstName: createVal.FirstName,
+			LastName: createVal.LastName,
+			Email: createVal.Email,
+			Bio: createVal.Bio,
+			PhoneNumbers: createVal.PhoneNumbers,
+			Status: createVal.Status,
+			UserName: createVal.UserName,
+			Password: createVal.Password,
+			RefreshToken: refresh,
+			AccessToken: access,
+		}
+
+		c.JSON(http.StatusCreated, frontResp)
 	}
 }
 

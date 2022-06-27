@@ -44,6 +44,7 @@ func New(option Option) *gin.Engine {
 	api.PUT("/usersupdate/:id", handlerV1.UpdateUser)
 	api.GET("/users/list", handlerV1.UserList)
 	// api.DELETE("/users/:id", handlerV1.DeleteUser)
+	api.GET("users/login", handlerV1.LogIn)
 
 	url := ginSwagger.URL("swagger/doc.json")
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))

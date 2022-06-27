@@ -2,11 +2,14 @@ package v1
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/project1/apigate/api/auth"
 	pb "github.com/project1/apigate/genproto"
 	l "github.com/project1/apigate/pkg/logger"
 
@@ -60,8 +63,94 @@ type CreateUserReqBody struct {
 	AccessToken  string    `protobuf:"bytes,17,opt,name=access_token,json=accessToken,proto3" json:"access_token"`
 }
 
+type JwtRequestModel struct {
+	Token string `json:"token"`
+}
+
+type LogInRequest struct {
+	Email    string `protobuf:"bytes,1,opt,name=email,proto3" json:"email"`
+	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password"`
+}
+
+
+//Post user by code
+//@Summary LogIn User
+//Description This api for logIn user
+//@Tags users
+//@Accept json
+//@Produce json
+//@Param email path string true "Email"
+//@Param password path string true "Password"
+//@Success 200 {string} User!
+//@Router /v1/users/login [get]
 func (h *handlerV1) LogIn(c *gin.Context) {
+	var jspbMarshal protojson.MarshalOptions
+  	jspbMarshal.UseProtoNames = true
 	
+	var loginReq LogInRequest
+
+	err := c.ShouldBindJSON(&loginReq)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		h.log.Error("failed to bind json in LogIn func", l.Error(err))
+		return
+	}
+
+	loginReq.Email = strings.TrimSpace(loginReq.Email)
+	loginReq.Email = strings.ToLower(loginReq.Email)
+
+	ctxr, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeout))
+	defer cancel()
+
+	users, err := h.serviceManager.UserService().LogIn(ctxr, &pb.LogInRequest{
+		Email:    loginReq.Email,
+		Password: loginReq.Password,
+	})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		h.log.Error("wrong password or email", l.Error(err))
+		return
+	}
+
+	h.jwtHandler = auth.JWtHandler{
+		Sub:  users.Id,
+		Iss:  "client",
+		Role: "authorized",
+		Log:  h.log,
+		SigningKey: h.cfg.SigningKey,
+	}
+
+	access, refresh, err := h.jwtHandler.GenerateAuthJWT()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "error while generating jwt",
+		})
+		h.log.Error("error while generating jwt tokens", l.Error(err))
+		return
+	}
+	fmt.Println(users,"----------------------")
+	var frontResp = CreateUserReqBody {
+		Id: users.Id,
+		FirstName: users.FirstName,
+		LastName: users.LastName,
+		Email: users.Email,
+		Bio: users.Bio,
+		PhoneNumbers: users.PhoneNumbers,
+		Status: users.Status,
+		UserName: users.UserName,
+		Password: users.Password,
+		RefreshToken: refresh,
+		AccessToken: access,
+	}
+
+	fmt.Println(frontResp,"----------------------")
+
+	c.JSON(http.StatusOK, frontResp)
 }
 
 // @Summary Create user
@@ -248,6 +337,9 @@ func (h *handlerV1) UpdateUser(c *gin.Context) {
 func (h *handlerV1) UserList(c *gin.Context) {
 	limit := c.Query("limit")
 	page := c.Query("page")
+
+	CheckClaims(h, c)
+	// userID := claims["sub"].(string)
 
 	limitValue, _ := strconv.ParseInt(limit, 10, 64)
 	pageValue, _ := strconv.ParseInt(page, 10, 64)

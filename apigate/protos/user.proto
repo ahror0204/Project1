@@ -12,7 +12,7 @@ service UserService {
     // rpc GetUserFromPost(GetUserFromPostRequest) returns (GetUserFromPostResponse);
     rpc UserList(UserListRequest) returns (UserListResponse);
     rpc CheckField(UserCheckRequest) returns (UserCheckResponse);
-    rpc LogIn(LogInRequest) returns (LogInResponse);
+    rpc LogIn(LogInRequest) returns (User);
 }
 
 message LogInRequest {
@@ -20,19 +20,6 @@ message LogInRequest {
     string password = 2;
 }
 
-message LogInResponse {
-    string id = 1;
-    string first_name = 2;
-    string last_name = 3;
-    string email = 4;
-    string bio = 5;
-    repeated string phone_numbers= 6;
-    repeated Address address = 7;
-    string status = 8;
-    repeated Post posts = 12;
-    string user_name = 13;
-    string password = 14;
-}
 //-------------------------CheckField----------------------------
 
 message UserCheckRequest {
@@ -89,10 +76,7 @@ message User {
     repeated Post posts = 12;
     string user_name =13;
     string password = 14;
-    string refresh_token = 15;
-    string access_token = 16;
     string email_code = 17;
-
 }
 
 message Address {

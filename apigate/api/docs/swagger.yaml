@@ -169,6 +169,31 @@ paths:
       summary: Get users list
       tags:
       - users
+  /v1/users/login:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Email
+        in: path
+        name: email
+        required: true
+        type: string
+      - description: Password
+        in: path
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: LogIn User
+      tags:
+      - users
   /v1/users/register:
     post:
       consumes:

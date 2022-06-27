@@ -54,3 +54,25 @@ func (jwtHandler *JWtHandler) GenerateAuthJWT() (access, refresh string, err err
 
 	return access, refresh, nil
 }
+
+// ExtractClaims ...
+func (jwtHandler *JWtHandler) ExtractClaims() (jwt.MapClaims, error) {
+	var (
+		token *jwt.Token
+		err error
+	)
+
+	token, err = jwt.Parse(jwtHandler.Token, func(t *jwt.Token) (interface{}, error) {
+		return []byte(jwtHandler.SigningKey), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !(ok && token.Valid) {
+		jwtHandler.Log.Error("invalid jwt token")
+		return nil, err
+	}
+	return claims, nil
+}
