@@ -58,6 +58,13 @@ definitions:
       email_code:
         type: string
     type: object
+  v1.LogInRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
   v1.Media:
     properties:
       id:
@@ -143,6 +150,23 @@ paths:
       summary: Get all users
       tags:
       - users
+  /v1/users/idfromtoken:
+    get:
+      consumes:
+      - application/json
+      description: This api for Get User By Token ID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get User By ID From Token
+      tags:
+      - users
   /v1/users/list:
     get:
       consumes:
@@ -170,20 +194,17 @@ paths:
       tags:
       - users
   /v1/users/login:
-    get:
+    post:
       consumes:
       - application/json
+      description: This api for logIn user
       parameters:
-      - description: Email
-        in: path
-        name: email
+      - description: Passvor and Email
+        in: body
+        name: user
         required: true
-        type: string
-      - description: Password
-        in: path
-        name: password
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/v1.LogInRequest'
       produces:
       - application/json
       responses:
@@ -265,4 +286,10 @@ paths:
       summary: Update user by id
       tags:
       - users
+securityDefinitions:
+  BearerAuth:
+    description: GetMyProfile
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

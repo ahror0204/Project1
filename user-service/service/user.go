@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-
 	// "os/user"
 
 	"github.com/jmoiron/sqlx"
@@ -13,9 +12,9 @@ import (
 
 	// "golang.org/x/tools/go/analysis/passes/nilfunc"
 
+	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"golang.org/x/crypto/bcrypt"
 )
 
 //UserService ...
@@ -34,7 +33,7 @@ func NewUserService(db *sqlx.DB, log l.Logger, client cl.GrpcClientI) *UserServi
 	}
 }
 
-func(s *UserService) LogIn(ctx context.Context, req *pb.LogInRequest) (*pb.User, error) {
+func (s *UserService) LogIn(ctx context.Context, req *pb.LogInRequest) (*pb.User, error) {
 	user, err := s.storage.User().LogIn(req)
 	if err != nil {
 		s.logger.Error("pasword", l.Error(err))
@@ -42,13 +41,13 @@ func(s *UserService) LogIn(ctx context.Context, req *pb.LogInRequest) (*pb.User,
 	}
 
 	posts, err := s.client.PostService().GetAllUserPosts(ctx, &pb.GetUserPostsrequest{UserId: user.Id})
-	
+
 	if err != nil {
 		s.logger.Error("failed while getting user posts", l.Error(err))
 		return nil, status.Error(codes.Internal, "failed while getting user posts")
 	}
 	user.Posts = posts.Posts
-	
+
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
 		s.logger.Error("password comparison error", l.Error(err))
@@ -185,9 +184,9 @@ func (s *UserService) UserList(ctx context.Context, req *pb.UserListRequest) (*p
 }
 
 func (s *UserService) CheckField(ctx context.Context, req *pb.UserCheckRequest) (*pb.UserCheckResponse, error) {
-	
+
 	bl, err := s.storage.User().CheckFeild(req.Field, req.Value)
-	
+
 	if err != nil {
 		s.logger.Error("CheckFeild FUNC ERROR", l.Error(err))
 		return nil, status.Error(codes.Internal, "CheckFeild FUNC ERROR")

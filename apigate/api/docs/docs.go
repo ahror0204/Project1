@@ -73,6 +73,34 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/users/idfromtoken": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "This api for Get User By Token ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get User By ID From Token",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/users/list": {
             "get": {
                 "description": "This api uses for getting users list",
@@ -113,7 +141,8 @@ const docTemplate = `{
             }
         },
         "/v1/users/login": {
-            "get": {
+            "post": {
+                "description": "This api for logIn user",
                 "consumes": [
                     "application/json"
                 ],
@@ -126,18 +155,13 @@ const docTemplate = `{
                 "summary": "LogIn User",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Email",
-                        "name": "email",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Password",
-                        "name": "password",
-                        "in": "path",
-                        "required": true
+                        "description": "Passvor and Email",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.LogInRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -383,6 +407,17 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.LogInRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "v1.Media": {
             "type": "object",
             "properties": {
@@ -419,6 +454,14 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "GetMyProfile",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -11,7 +12,7 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
-	"github.com/project1/apigate/api/auth"
+	// "github.com/project1/apigate/api/auth"
 	pb "github.com/project1/apigate/genproto"
 	l "github.com/project1/apigate/pkg/logger"
 
@@ -20,7 +21,6 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 
 	"crypto/tls"
-	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -210,27 +210,7 @@ func (h handlerV1) VerifyUser(c *gin.Context) {
 		h.log.Error("failed while using CreateUser func in verify user func!!!", l.Error(err))
 		return
 	}
-	//------------------------------------------------------------------------------------------
 
-	h.jwtHandler = auth.JWtHandler{
-		Sub:  redisBody.Id,
-		Iss:  "client",
-		Role: "authorized",
-		Log:  h.log,
-		SigningKey: h.cfg.SigningKey,
-	}
-
-	access, refresh, err := h.jwtHandler.GenerateAuthJWT()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "error while generating jwt",
-		})
-		h.log.Error("error while generating jwt tokens", l.Error(err))
-		return
-	}
-
-	
-//--------------------------------------------------------------------------------------
 	if mailData.EmailCode == redisBody.EmailCode {
 
 		createVal, err := h.serviceManager.UserService().CreateUser(ctx, redisBody)
@@ -242,18 +222,16 @@ func (h handlerV1) VerifyUser(c *gin.Context) {
 			return
 		}
 
-		var frontResp = CreateUserReqBody {
-			Id: createVal.Id,
-			FirstName: createVal.FirstName,
-			LastName: createVal.LastName,
-			Email: createVal.Email,
-			Bio: createVal.Bio,
+		var frontResp = CreateUserReqBody{
+			Id:           createVal.Id,
+			FirstName:    createVal.FirstName,
+			LastName:     createVal.LastName,
+			Email:        createVal.Email,
+			Bio:          createVal.Bio,
 			PhoneNumbers: createVal.PhoneNumbers,
-			Status: createVal.Status,
-			UserName: createVal.UserName,
-			Password: createVal.Password,
-			RefreshToken: refresh,
-			AccessToken: access,
+			Status:       createVal.Status,
+			UserName:     createVal.UserName,
+			Password:     createVal.Password,
 		}
 
 		c.JSON(http.StatusCreated, frontResp)
@@ -287,7 +265,6 @@ func SendEmail(email, code string) {
 
 	// Now send E-Mail
 	if err := d.DialAndSend(m); err != nil {
-		fmt.Println(err)
 		panic(err)
 	}
 

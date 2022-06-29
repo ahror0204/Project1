@@ -22,6 +22,12 @@ type Option struct {
 	RedisRepo      repo.RedisRepositoryStorage
 }
 
+// New @BasePath /v1
+// New ...
+// @SecurityDefinitions.apikey BearerAuth
+// @Description GetMyProfile
+// @in header
+// @name Authorization
 func New(option Option) *gin.Engine {
 	router := gin.New()
 
@@ -35,7 +41,7 @@ func New(option Option) *gin.Engine {
 		Redis:          option.RedisRepo,
 	})
 
-	api := router.Group("v1")
+	api := router.Group("/v1")
 	api.POST("/users/verification", handlerV1.VerifyUser)
 	api.POST("/users/register", handlerV1.RegisterUser)
 	api.POST("/users", handlerV1.CreateUser)
@@ -44,7 +50,8 @@ func New(option Option) *gin.Engine {
 	api.PUT("/usersupdate/:id", handlerV1.UpdateUser)
 	api.GET("/users/list", handlerV1.UserList)
 	// api.DELETE("/users/:id", handlerV1.DeleteUser)
-	api.GET("users/login", handlerV1.LogIn)
+	api.POST("users/login", handlerV1.LogIn)
+	api.GET("users/idfromtoken", handlerV1.GetUserByIDFromToken)
 
 	url := ginSwagger.URL("swagger/doc.json")
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))

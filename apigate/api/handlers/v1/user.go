@@ -2,7 +2,6 @@ package v1
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"net/http"
@@ -72,22 +71,53 @@ type LogInRequest struct {
 	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password"`
 }
 
-
-//Post user by code
-//@Summary LogIn User
-//Description This api for logIn user
+//@Summary Get User By ID From Token
+//@Description This api for Get User By Token ID
 //@Tags users
 //@Accept json
 //@Produce json
-//@Param email path string true "Email"
-//@Param password path string true "Password"
-//@Success 200 {string} User!
-//@Router /v1/users/login [get]
+// @Security BearerAuth
+//@Success 200 {string} success!
+//@Router /v1/users/idfromtoken [get]
+func(h *handlerV1) GetUserByIDFromToken(c *gin.Context) {
+	
+	var jspbMarshal protojson.MarshalOptions
+  	jspbMarshal.UseProtoNames = true
+
+	claims := CheckClaims(h, c)
+	UserID := claims["sub"].(string)
+
+	ctxr, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeout))
+	defer cancel()
+
+	user, err := h.serviceManager.UserService().GetUserById(ctxr, &pb.GetUserByIdRequest{
+		Id: UserID,
+	})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		h.log.Error("error while getting user by id <<<", l.Error(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+//@Summary LogIn User
+//@Description This api for logIn user
+//@Tags users
+//@Accept json
+//@Produce json
+//@Param user body LogInRequest true "Passvor and Email"
+//@Success 200 {string} success!
+//@Router /v1/users/login [post]
 func (h *handlerV1) LogIn(c *gin.Context) {
 	var jspbMarshal protojson.MarshalOptions
   	jspbMarshal.UseProtoNames = true
 	
-	var loginReq LogInRequest
+	var loginReq *LogInRequest
 
 	err := c.ShouldBindJSON(&loginReq)
 	if err != nil {
@@ -133,7 +163,6 @@ func (h *handlerV1) LogIn(c *gin.Context) {
 		h.log.Error("error while generating jwt tokens", l.Error(err))
 		return
 	}
-	fmt.Println(users,"----------------------")
 	var frontResp = CreateUserReqBody {
 		Id: users.Id,
 		FirstName: users.FirstName,
@@ -147,8 +176,6 @@ func (h *handlerV1) LogIn(c *gin.Context) {
 		RefreshToken: refresh,
 		AccessToken: access,
 	}
-
-	fmt.Println(frontResp,"----------------------")
 
 	c.JSON(http.StatusOK, frontResp)
 }
@@ -341,6 +368,7 @@ func (h *handlerV1) UserList(c *gin.Context) {
 	CheckClaims(h, c)
 	// userID := claims["sub"].(string)
 
+
 	limitValue, _ := strconv.ParseInt(limit, 10, 64)
 	pageValue, _ := strconv.ParseInt(page, 10, 64)
 
@@ -361,7 +389,7 @@ func (h *handlerV1) UserList(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-		h.log.Error("ailed to list users", l.Error(err))
+		h.log.Error("failed to list users", l.Error(err))
 		return
 	}
 
