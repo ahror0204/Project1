@@ -2,15 +2,13 @@ package service
 
 import (
 	"context"
-	// "os/user"
 
 	"github.com/jmoiron/sqlx"
 	pb "github.com/project1/user-service/genproto"
 	l "github.com/project1/user-service/pkg/logger"
+	"github.com/project1/user-service/pkg/messagebroker"
 	cl "github.com/project1/user-service/service/grpc_client"
 	"github.com/project1/user-service/storage"
-
-	// "golang.org/x/tools/go/analysis/passes/nilfunc"
 
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
@@ -19,17 +17,19 @@ import (
 
 //UserService ...
 type UserService struct {
-	storage storage.IStorage
-	logger  l.Logger
-	client  cl.GrpcClientI
+	storage   storage.IStorage
+	logger    l.Logger
+	client    cl.GrpcClientI
+	publisher map[string]messagebroker.Publisher
 }
 
 //NewUserService ...
-func NewUserService(db *sqlx.DB, log l.Logger, client cl.GrpcClientI) *UserService {
+func NewUserService(db *sqlx.DB, log l.Logger, client cl.GrpcClientI, publisher map[string]messagebroker.Publisher) *UserService {
 	return &UserService{
-		storage: storage.NewStoragePg(db),
-		logger:  log,
-		client:  client,
+		storage:   storage.NewStoragePg(db),
+		logger:    log,
+		client:    client,
+		publisher: publisher,
 	}
 }
 
@@ -57,6 +57,24 @@ func (s *UserService) LogIn(ctx context.Context, req *pb.LogInRequest) (*pb.User
 	return user, nil
 }
 
+// publishUserMessage KAFKA
+func (s *UserService) publishUserMessage(rawUser pb.User) error {
+	data, err := rawUser.Marshal()
+	if err != nil {
+		return err
+	}
+
+	logProduct := rawUser.String()
+
+	err = s.publisher["user"].Publish([]byte("user"), data, logProduct)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *UserService) CreateUser(ctx context.Context, req *pb.User) (*pb.User, error) {
 
 	user, err := s.storage.User().CreateUser(req)
@@ -75,6 +93,13 @@ func (s *UserService) CreateUser(ctx context.Context, req *pb.User) (*pb.User, e
 			user.Posts = append(user.Posts, createdPosts)
 		}
 	}
+
+	err = s.publishUserMessage(*user)
+	if err != nil {
+		s.logger.Error("failed while publishing user info", l.Error(err))
+		return nil, status.Error(codes.Internal, "failed while publishing user info")
+	}
+
 	return user, nil
 }
 
@@ -194,3 +219,5 @@ func (s *UserService) CheckField(ctx context.Context, req *pb.UserCheckRequest) 
 
 	return &pb.UserCheckResponse{Response: bl}, nil
 }
+
+

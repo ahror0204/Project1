@@ -141,3 +141,13 @@ func (r *postRepo) GetUserByPostId(postID string) (*pb.GetUserByPostIdResponse, 
 	}
 	return &post, nil
 }
+
+func (r *postRepo) CreatePostUser(user *pb.User) error {
+	_, err := r.db.Query("INSERT INTO post_users (id, first_name, last_name) VALUES ($1,$2,$3)", user.Id, user.FirstName, user.LastName)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

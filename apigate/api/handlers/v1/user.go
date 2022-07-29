@@ -76,7 +76,7 @@ type LogInRequest struct {
 //@Tags users
 //@Accept json
 //@Produce json
-// @Security BearerAuth
+//@Security BearerAuth
 //@Success 200 {string} success!
 //@Router /v1/users/idfromtoken [get]
 func(h *handlerV1) GetUserByIDFromToken(c *gin.Context) {
@@ -293,6 +293,11 @@ func (h *handlerV1) GetAllUser(c *gin.Context) {
 
 	var jspbMarshal protojson.MarshalOptions
 	jspbMarshal.UseProtoNames = true
+	// limitString := c.Query("limit") 
+	// pageString := c.Query("page")
+
+	// _, err := strconv.ParseInt(limitString, 10, 64)
+	// _, err = strconv.ParseInt(pageString, 10, 64)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(h.cfg.CtxTimeout))
 	defer cancel()
@@ -420,3 +425,18 @@ func (h *handlerV1) UserList(c *gin.Context) {
 
 // 	c.JSON(http.StatusOK, response)
 // }
+
+
+
+// CreateCustomer Creates new customer
+// @Summary Create new customer
+// @Description This API for creating new customer
+// @Tags Customer
+// @Accept json
+// @Produce json
+// @Param Customer body(query, path) CreateUserReqBody(type) true(ko'rsatilishi shartmi yoki yo'q) "Customer body"(name)
+// @Success 200 {string}() CreateUserReqBody
+// @Router /v1/create/customer [POST]
+func (h *handlerV1) CreateCustomer(c *gin.Context) {
+
+}

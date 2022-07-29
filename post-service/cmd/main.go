@@ -4,6 +4,7 @@ import (
 	"net"
 
 	"github.com/project1/post-service/config"
+	"github.com/project1/post-service/events"
 	pb "github.com/project1/post-service/genproto"
 	"github.com/project1/post-service/pkg/db"
 	"github.com/project1/post-service/pkg/logger"
@@ -34,6 +35,9 @@ func main() {
 		log.Error("error establishing grpc connection", logger.Error(err))
 		return
 	}
+
+	postUserCreateTopic := events.NewKafkaConsumer(connDB, &cfg, log, "user.user")
+	go postUserCreateTopic.Start()
 
 	postService := service.NewPostService(connDB, log, grpcC)
 

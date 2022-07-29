@@ -10,4 +10,5 @@ type PostStorageI interface {
 	GetPostById(id string) (*pb.Post, error)
 	GetAllUserPosts(userID string) ([]*pb.Post, error)
 	GetUserByPostId(postID string) (*pb.GetUserByPostIdResponse, error)
+	CreatePostUser(user *pb.User) error
 }

@@ -1,6 +1,9 @@
 package api
 
 import (
+	casbinN "github.com/casbin/casbin/v2"
+	"github.com/project1/apigate/api/auth"
+	"github.com/project1/apigate/api/casbin"
 	v1 "github.com/project1/apigate/api/handlers/v1"
 	"github.com/project1/apigate/config"
 	"github.com/project1/apigate/pkg/logger"
@@ -20,6 +23,7 @@ type Option struct {
 	Logger         logger.Logger
 	ServiceManager services.IServiceManager
 	RedisRepo      repo.RedisRepositoryStorage
+	Casbin         casbinN.Enforcer
 }
 
 // New @BasePath /v1
@@ -33,6 +37,11 @@ func New(option Option) *gin.Engine {
 
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
+	jwtHandler := auth.JWtHandler{
+		SigningKey: option.Conf.SigningKey,
+		Log: option.Logger,
+	}
+	router.Use(casbin.NewJwtRoleStruct(&option.Casbin, option.Conf, jwtHandler))
 
 	handlerV1 := v1.New(&v1.HandlerV1Config{
 		Logger:         option.Logger,

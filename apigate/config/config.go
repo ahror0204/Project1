@@ -12,6 +12,12 @@ type Config struct {
 	UserServiceHost string
 	UserServicePort int
 
+	PostgresHost string
+	PostgresPort int
+	PostgresUser string
+	PostgresPassword string
+	PostgresDatabase string
+
 	//context timeout in seconds
 	CtxTimeout int
 	RedisHost  string
@@ -27,6 +33,12 @@ func Load() Config {
 	c := Config{}
 
 	c.Environment = cast.ToString(getOrReturnDefault("ENVIRONMENT", "develop"))
+
+	c.PostgresHost = cast.ToString(getOrReturnDefault("POSTGRES_HOST", "localhost"))
+	c.PostgresPort = cast.ToInt(getOrReturnDefault("POSTGRES_PORT", 5432))
+	c.PostgresUser = cast.ToString(getOrReturnDefault("POSTGRES_USER", "postgres"))
+	c.PostgresPassword = cast.ToString(getOrReturnDefault("POSTGRES_PASSWORD", "1"))
+	c.PostgresDatabase = cast.ToString(getOrReturnDefault("POSTGRES_DB", "template"))
 
 	c.LogeLevel = cast.ToString(getOrReturnDefault("LOG_LEVEL", "debug"))
 	c.HTTPPort = cast.ToString(getOrReturnDefault("HTTP_PORT", ":8080"))

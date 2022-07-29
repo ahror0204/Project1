@@ -4,9 +4,11 @@ import (
 	"net"
 
 	"github.com/project1/user-service/config"
+	"github.com/project1/user-service/events"
 	pb "github.com/project1/user-service/genproto"
 	"github.com/project1/user-service/pkg/db"
 	"github.com/project1/user-service/pkg/logger"
+	"github.com/project1/user-service/pkg/messagebroker"
 	"github.com/project1/user-service/service"
 	grpcClient "github.com/project1/user-service/service/grpc_client"
 	"google.golang.org/grpc"
@@ -34,8 +36,22 @@ func main() {
 		log.Error("error establishing grpc connection", logger.Error(err))
 		return
 	}
+    
+    //KAFKA 
+    publishersMap := make(map[string]messagebroker.Publisher)
+    userTopicPublisher := events.NewKafkaPublisherBroker(cfg, log, "user.user")
+    defer func() {
+        err := userTopicPublisher.Stop()
+        if err != nil {
+            log.Fatal("failed to stop kafka producer", logger.Error(err))
+        }
+    }()
+        
+    publishersMap["user"] = userTopicPublisher
+     
+    //KAFKA END
 
-    userService := service.NewUserService(connDB, log, grpcC)
+    userService := service.NewUserService(connDB, log, grpcC, publishersMap)
 
     lis, err := net.Listen("tcp", cfg.RPCPort)
     if err != nil {
