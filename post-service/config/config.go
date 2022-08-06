@@ -28,12 +28,12 @@ func Load() Config {
 
     c.Environment = cast.ToString(getOrReturnDefault("ENVIRONMENT", "develop"))
 
-    c.PostgresHost = cast.ToString(getOrReturnDefault("POSTGRES_HOST", "localhost"))
-    c.PostgresPort = cast.ToInt(getOrReturnDefault("POSTGRES_PORT", 5432))
+    c.PostgresHost = cast.ToString(getOrReturnDefault("POSTGRES_HOST", "dbpost"))
+    c.PostgresPort = cast.ToInt(getOrReturnDefault("POSTGRES_PORT", 5434))
     c.PostgresDatabase = cast.ToString(getOrReturnDefault("POSTGRES_DATABASE", "postdb"))
     c.PostgresUser = cast.ToString(getOrReturnDefault("POSTGRES_USER", "postgres"))
     c.PostgresPassword = cast.ToString(getOrReturnDefault("POSTGRES_PASSWORD", "1"))
-    c.UserServiceHost = cast.ToString(getOrReturnDefault("USER_SERVISE_HOST", "127.0.0.1"))
+    c.UserServiceHost = cast.ToString(getOrReturnDefault("USER_SERVISE_HOST", "user_service"))
     c.UserServicePort = cast.ToInt(getOrReturnDefault("USER_SERVICE_PORT", 9000))
     c.KafkaHost = cast.ToString(getOrReturnDefault("KAFKA_HOST", "127.0.0.1"))
 	c.KafkaPort = cast.ToInt(getOrReturnDefault("KAFKA_PORT", 9092))

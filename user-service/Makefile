@@ -11,7 +11,7 @@ create-migrations:
 	migrate create -ext sql -dir migrations -seq addtokencolumn
 
 migrate-up:
-	migrate -path migrations/ -database postgres://postgres:1@localhost:5432/template?sslmode=disable up
+	migrate -path migrations/ -database postgres://postgres:1@dbuser:5433/template?sslmode=disable up
 
 migrate-down:
 	migrate -path migrations/ -database postgres://postgres:1@localhost:5432/template?sslmode=disable down

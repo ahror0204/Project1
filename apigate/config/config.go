@@ -43,11 +43,11 @@ func Load() Config {
 	c.LogeLevel = cast.ToString(getOrReturnDefault("LOG_LEVEL", "debug"))
 	c.HTTPPort = cast.ToString(getOrReturnDefault("HTTP_PORT", ":8080"))
 
-	c.UserServiceHost = cast.ToString(getOrReturnDefault("USER_SERVICE_HOST", "127.0.0.1"))
+	c.UserServiceHost = cast.ToString(getOrReturnDefault("USER_SERVICE_HOST", "user_service"))
 	c.UserServicePort = cast.ToInt(getOrReturnDefault("USER_SERVICE_PORT", 9000))
 
-	c.RedisHost = cast.ToString(getOrReturnDefault("REDIS_HOST", "localhost"))
-	c.RedisPort = cast.ToInt(getOrReturnDefault("REDIS_PORT", 6379))
+	c.RedisHost = cast.ToString(getOrReturnDefault("REDIS_HOST", "redisdb"))
+	c.RedisPort = cast.ToInt(getOrReturnDefault("REDIS_PORT", 6378))
 
 	c.SigningKey = cast.ToString(getOrReturnDefault("SIGNING_KEY", "bzqymwhbwgholtdyzjvqaycuxwnmeqczzosvmafrjfskmepquudmdktutkyzowntnvwurvkxywkpxsexhkkwcqgsbbbxlqyuklcrbypczsfhwejwqebsxqmprueopdexwdmukhfkujxhjeecfiwwspjgbgcgowew"))
 	

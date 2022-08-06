@@ -6,3 +6,15 @@ build:
 proto-gen:
 	./scripts/gen-proto.sh	${CURRENT_DIR}
 	ls genproto/*.pb.go | xargs -n1 -IX bash -c "sed -e '/bool/ s/,omitempty//' X > X.tmp && mv X{.tmp,}"
+
+create-migrations:
+	migrate create -ext sql -dir migrations -seq addtokencolumn
+
+migrate-up:
+	migrate -path migrations/ -database postgres://postgres:1@dbpost:5434/postdb?sslmode=disable up
+
+migrate-down:
+	migrate -path migrations/ -database postgres://postgres:1@localhost:5432/template?sslmode=disable down
+
+migrate-forse:
+	migrate -path migrations/ -database postgres://postgres:1@localhost:5432/template?sslmode=disable force 1
