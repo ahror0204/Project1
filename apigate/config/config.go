@@ -12,9 +12,9 @@ type Config struct {
 	UserServiceHost string
 	UserServicePort int
 
-	PostgresHost string
-	PostgresPort int
-	PostgresUser string
+	PostgresHost     string
+	PostgresPort     int
+	PostgresUser     string
 	PostgresPassword string
 	PostgresDatabase string
 
@@ -34,11 +34,11 @@ func Load() Config {
 
 	c.Environment = cast.ToString(getOrReturnDefault("ENVIRONMENT", "develop"))
 
-	c.PostgresHost = cast.ToString(getOrReturnDefault("POSTGRES_HOST", "localhost"))
-	c.PostgresPort = cast.ToInt(getOrReturnDefault("POSTGRES_PORT", 5432))
+	c.PostgresHost = cast.ToString(getOrReturnDefault("POSTGRES_HOST", "dbpost"))
+	c.PostgresPort = cast.ToInt(getOrReturnDefault("POSTGRES_PORT", 5434))
 	c.PostgresUser = cast.ToString(getOrReturnDefault("POSTGRES_USER", "postgres"))
 	c.PostgresPassword = cast.ToString(getOrReturnDefault("POSTGRES_PASSWORD", "1"))
-	c.PostgresDatabase = cast.ToString(getOrReturnDefault("POSTGRES_DB", "template"))
+	c.PostgresDatabase = cast.ToString(getOrReturnDefault("POSTGRES_DB", "postdb"))
 
 	c.LogeLevel = cast.ToString(getOrReturnDefault("LOG_LEVEL", "debug"))
 	c.HTTPPort = cast.ToString(getOrReturnDefault("HTTP_PORT", ":8080"))
@@ -47,10 +47,10 @@ func Load() Config {
 	c.UserServicePort = cast.ToInt(getOrReturnDefault("USER_SERVICE_PORT", 9000))
 
 	c.RedisHost = cast.ToString(getOrReturnDefault("REDIS_HOST", "redisdb"))
-	c.RedisPort = cast.ToInt(getOrReturnDefault("REDIS_PORT", 6378))
+	c.RedisPort = cast.ToInt(getOrReturnDefault("REDIS_PORT", 6379))
 
 	c.SigningKey = cast.ToString(getOrReturnDefault("SIGNING_KEY", "bzqymwhbwgholtdyzjvqaycuxwnmeqczzosvmafrjfskmepquudmdktutkyzowntnvwurvkxywkpxsexhkkwcqgsbbbxlqyuklcrbypczsfhwejwqebsxqmprueopdexwdmukhfkujxhjeecfiwwspjgbgcgowew"))
-	
+
 	c.CtxTimeout = cast.ToInt(getOrReturnDefault("CTX_TIMEOUT", 7))
 
 	return c

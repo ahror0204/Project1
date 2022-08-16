@@ -242,7 +242,7 @@ func SendEmail(email, code string) {
 	m := gomail.NewMessage()
 
 	// Set E-Mail sender
-	m.SetHeader("From", "ahrorahrorovnt@gmail.com")
+	m.SetHeader("From", "postgrespostgresovnt@gmail.com")
 
 	// Set E-Mail receivers
 	m.SetHeader("To", email)
@@ -257,7 +257,7 @@ func SendEmail(email, code string) {
 	m.SetBody("text/plain", code)
 
 	// Settings for SMTP server
-	d := gomail.NewDialer("smtp.gmail.com", 587, "ahrorahrorovnt@gmail.com", "qmxlgijkvuuoacrh")
+	d := gomail.NewDialer("smtp.gmail.com", 587, "postgrespostgresovnt@gmail.com", "qmxlgijkvuuoacrh")
 
 	// This is only needed when SSL/TLS certificate is not valid on server.
 	// In production this should be set to false.

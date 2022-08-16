@@ -460,7 +460,7 @@ const docTemplate = `{
         "BearerAuth": {
             "description": "GetMyProfile",
             "type": "apiKey",
-            "name": "Authorization",
+            "name": "Authorization+",
             "in": "header"
         }
     }

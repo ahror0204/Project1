@@ -437,6 +437,7 @@ func (h *handlerV1) UserList(c *gin.Context) {
 // @Param Customer body(query, path) CreateUserReqBody(type) true(ko'rsatilishi shartmi yoki yo'q) "Customer body"(name)
 // @Success 200 {string}() CreateUserReqBody
 // @Router /v1/create/customer [POST]
+
 func (h *handlerV1) CreateCustomer(c *gin.Context) {
 
 }

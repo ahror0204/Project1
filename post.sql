@@ -17,3 +17,15 @@ CREATE TABLE IF NOT EXISTS medias(
     post_id uuid,
     FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS post_users(
+    id uuid primary key not null,
+    first_name varchar(50),
+    last_name varchar(50)
+);
+
+CREATE TABLE IF NOT EXISTS users(
+    id uuid primary key not null,
+    first_name varchar(250),
+    last_name varchar(250)
+);
